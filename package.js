@@ -10,7 +10,7 @@ Package.onUse(function(api){
   api.versionsFrom('1.1.0.2');
 
   api.use('accounts-base', ['client', 'server']);
-  api.use('momentjs:moment', ['client', 'server']);
+  api.use('momentjs:moment@2.10.3', ['client', 'server']);
 
   api.addFiles('tokenizer.js', ['client', 'server']);
   api.export('Tokenizer');
