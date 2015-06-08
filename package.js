@@ -2,7 +2,7 @@ Package.describe({
   name: 'poetic:tokenizer',
   version: '0.0.1',
   summary: 'create tokens to validate user interactions',
-  git: '',
+  git: 'https://github.com/poetic/tokenizer',
   documentation: 'README.md'
 });
 
