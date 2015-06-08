@@ -16,8 +16,8 @@ Tokenizer = {
   },
 
   verify: function(token, callback){
-    Meteor.call('verifyToken', token, function(result){
-      if (result.error) { return callback(result.error) }
+    Meteor.call('verifyToken', token, function(err, result){
+      if (err) { return callback(err) }
 
       Accounts.verifyEmail(token, function(e){
         if (e) {
@@ -32,6 +32,8 @@ Tokenizer = {
 
 Meteor.methods({
   verifyToken: function(token){
+    check(token, String);
+
     var result = {};
     var user;
     var tokenRecord;
@@ -46,7 +48,7 @@ Meteor.methods({
           return tokenObj.token = token;
         });
 
-        if (tokenRecord.expires) {
+        if (tokenRecord && tokenRecord.expires) {
           var interval = Object.keys(tokenRecord.expires)[0];
           var quantity = tokenRecord.expires[interval];
 
@@ -56,10 +58,16 @@ Meteor.methods({
           if (now.isBefore(expiration)){
             return true;
           } else {
-            return { error: 'token has expired' };
+            throw new Meteor.Error('token has expired');
           }
-        }
-      }
+
+          // token does not have an expiration date
+        } else if (tokenRecord) {
+          return true;
+
+        } else { throw new Meteor.Error('token not found for this user') }
+
+      } else { throw new Meteor.Error('token not found for this user') }
     }
   }
 });
