@@ -8,8 +8,8 @@ Tokenizer = {
     };
 
     Meteor.users.update(
-      { _id: params.user._id },
-      { $push: { 'services.email.verificationTokens': tokenRecord } }
+      {_id: params.user._id},
+      {$push: {'services.email.verificationTokens': tokenRecord}}
     );
 
     return tokenRecord.token;
@@ -37,27 +37,38 @@ Meteor.methods({
     var result = {};
     var user;
     var tokenRecord;
+    var interval;
+    var quantity;
+    var expiration;
+    var now;
 
     if (Meteor.isServer) {
       user = Meteor.users.findOne({
         'services.email.verificationTokens.token': token
       });
+      console.log('user', user)
 
       if (user) {
         tokenRecord = _.find(user.services.email.verificationTokens, function(tokenObj){
           return tokenObj.token = token;
         });
+        console.log('token Record', tokenRecord)
+        console.log('token', tokenRecord.token)
 
         if (tokenRecord && tokenRecord.expires) {
-          var interval = Object.keys(tokenRecord.expires)[0];
-          var quantity = tokenRecord.expires[interval];
+          interval = Object.keys(tokenRecord.expires)[0];
+          quantity = tokenRecord.expires[interval];
 
-          var expiration = moment(tokenRecord.when).add(quantity, interval);
-          var now = moment();
+          expiration = moment(tokenRecord.when).add(quantity, interval);
+          now = moment();
+          console.log('now', now)
+          console.log('expiration', expiration)
+          console.log(now.isBefore(expiration))
 
-          if (now.isBefore(expiration)){
+          if (now.isBefore(expiration)) {
             return true;
           } else {
+            //return true;
             throw new Meteor.Error('token has expired');
           }
 

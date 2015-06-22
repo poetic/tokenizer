@@ -1,6 +1,6 @@
 Package.describe({
   name: 'poetic:tokenizer',
-  version: '0.0.1',
+  version: '0.0.2',
   summary: 'create tokens to validate user interactions',
   git: 'https://github.com/poetic/tokenizer',
   documentation: 'README.md'
@@ -16,4 +16,7 @@ Package.onUse(function(api){
   api.export('Tokenizer');
 });
 
-Package.onTest(function(api){});
+Package.onTest(function(api){
+  api.use(['poetic:tokenizer', 'tinytest', 'test-helpers']);
+  api.addFiles('tokenizer-test.js');
+});
