@@ -35,40 +35,28 @@ Meteor.methods({
     check(token, String);
 
     var result = {};
-    var user;
-    var tokenRecord;
-    var interval;
-    var quantity;
-    var expiration;
-    var now;
+    var user, tokenRecord, interval, quantity, expiration, now;
 
     if (Meteor.isServer) {
       user = Meteor.users.findOne({
         'services.email.verificationTokens.token': token
       });
-      console.log('user', user)
 
       if (user) {
         tokenRecord = _.find(user.services.email.verificationTokens, function(tokenObj){
-          return tokenObj.token = token;
+          return tokenObj.token === token;
         });
-        console.log('token Record', tokenRecord)
-        console.log('token', tokenRecord.token)
 
         if (tokenRecord && tokenRecord.expires) {
           interval = Object.keys(tokenRecord.expires)[0];
           quantity = tokenRecord.expires[interval];
 
-          expiration = moment(tokenRecord.when).add(quantity, interval);
+          tokenExpires = moment(tokenRecord.when).add(quantity, interval);
           now = moment();
-          console.log('now', now)
-          console.log('expiration', expiration)
-          console.log(now.isBefore(expiration))
 
-          if (now.isBefore(expiration)) {
+          if (now.isBefore(tokenExpires)) {
             return true;
           } else {
-            //return true;
             throw new Meteor.Error('token has expired');
           }
 
