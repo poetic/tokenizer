@@ -1,38 +1,35 @@
 Tokenizer = {
-  generate: function(params){
+  generate: function(params, callback){
     var email;
 
-    if (params.user.emails && params.user.emails.length) {
-      email = params.user.emails[0].address;
+    //if (params.user.emails && params.user.emails.length) {
+      //email = params.user.emails[0].address;
 
-    } else {
-      email = '';
-    }
+    //} else {
+      //email = '';
+    //}
 
     var tokenRecord = {
       token: Random.secret(),
-      address: email,
+      address: params.user.emails[0].address,
       when: new Date(),
       expires: params.expires
     };
 
-    Meteor.users.update(
-      {_id: params.user._id},
-      {$push: {'services.email.verificationTokens': tokenRecord}}
-    );
-
-    return tokenRecord.token;
+    Meteor.call('saveTokenToUser', params.user._id, tokenRecord, function(err, token){
+      return callback(token);
+    });
   },
 
   verify: function(token, callback){
-    Meteor.call('verifyToken', token, function(err, result){
+    Meteor.call('verifyToken', token, function(err, user){
       if (err) { return callback(err) }
 
       Accounts.verifyEmail(token, function(e){
         if (e) {
           callback(new Error('token is not valid'));
         } else {
-          callback(null, true);
+          callback(null, user);
         }
       });
     });
@@ -64,14 +61,16 @@ Meteor.methods({
           now = moment();
 
           if (now.isBefore(tokenExpires)) {
-            return true;
+            return user;
+            //return true;
           } else {
             throw new Meteor.Error('token has expired');
           }
 
           // token does not have an expiration date
         } else if (tokenRecord) {
-          return true;
+          return user;
+          //return true;
 
         } else { throw new Meteor.Error('token not found for this user') }
 
@@ -79,3 +78,16 @@ Meteor.methods({
     }
   }
 });
+
+if (Meteor.isServer) {
+  Meteor.methods({
+    saveTokenToUser: function(userId, tokenRecord){
+      Meteor.users.update(
+        {_id: userId},
+        {$push: {'services.email.verificationTokens': tokenRecord}}
+      );
+
+      return tokenRecord.token;
+    },
+  });
+}
