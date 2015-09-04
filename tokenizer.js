@@ -2,16 +2,16 @@ Tokenizer = {
   generate: function(params, callback){
     var email;
 
-    //if (params.user.emails && params.user.emails.length) {
-      //email = params.user.emails[0].address;
+    if (params.user.emails && params.user.emails.length) {
+      email = params.user.emails[0].address;
 
-    //} else {
-      //email = '';
-    //}
+    } else {
+      email = '';
+    }
 
     var tokenRecord = {
       token: Random.secret(),
-      address: params.user.emails[0].address,
+      address: email,
       when: new Date(),
       expires: params.expires
     };
