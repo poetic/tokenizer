@@ -11,6 +11,7 @@ Package.onUse(function(api){
 
   api.use('accounts-base', ['client', 'server']);
   api.use('momentjs:moment@2.10.3', ['client', 'server']);
+  api.use('random@1.0.4', ['client', 'server']);
 
   api.addFiles('tokenizer.js', ['client', 'server']);
   api.export('Tokenizer');
