@@ -1,6 +1,6 @@
 Package.describe({
   name: 'poetic:tokenizer',
-  version: '0.0.6',
+  version: '0.0.7',
   summary: 'create tokens to validate user interactions',
   git: 'https://github.com/poetic/tokenizer',
   documentation: 'README.md'
@@ -11,6 +11,7 @@ Package.onUse(function(api){
 
   api.use('accounts-base', ['client', 'server']);
   api.use('momentjs:moment@2.10.3', ['client', 'server']);
+  api.use('check');
 
   api.addFiles('tokenizer.js', ['client', 'server']);
   api.export('Tokenizer');
